@@ -21,7 +21,7 @@ Route::prefix('auth')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 });
 
-Route::apiResource('/posts', PostController::class);
+Route::apiResource('/posts', PostController::class)->middleware('auth:sanctum');
 
 Route::prefix('posts')->middleware('auth:sanctum')->group(function(){
 
@@ -51,7 +51,12 @@ Route::prefix('admin')->middleware(['auth:sanctum','role:admin,super_admin'])->g
 
 Route::prefix('comments')->middleware('auth:sanctum')->group(function(){
 
-    Route::apiResource('', CommentController::class);
+    Route::get('/',[CommentController::class,'index'])->middleware('auth:sanctum');
+    Route::get('/{comment}',[CommentController::class,'show'])->middleware('auth:sanctum');
+    Route::post('/{post}',[CommentController::class,'store'])->middleware('auth:sanctum');
+    Route::put('/{comment}',[CommentController::class,'update'])->middleware('auth:sanctum');
+    Route::delete('/{comment}',[CommentController::class,'destroy'])->middleware('auth:sanctum');
+   
     Route::post('/likes/toggle', [LikeController::class, 'toggleLike'])->name('likes.toggle-like');
 
     Route::get('/{post}',[CommentController::class,'getPostComments']);

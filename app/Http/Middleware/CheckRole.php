@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Controllers\Api\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Controllers\Api\Traits\ApiResponse;
 
 class CheckRole
 {

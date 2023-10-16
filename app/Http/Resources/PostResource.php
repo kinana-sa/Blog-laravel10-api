@@ -20,6 +20,7 @@ class PostResource extends JsonResource
             'body' => $this->body,
             'user_name' => $this->user->name,
             'image' => $this->images ? $this->images : null,
+            'video' => $this->videos ? $this->videos : null,
             'comments' => $this->comments->map(function ($comment) {
                 return [
                     'content' => $comment->content,

@@ -20,6 +20,8 @@ class CommentResource extends JsonResource
             'post_owner' => $this->post->user->name,
             'comment' => $this->content,
             'commented by' => $this->user->name,
+            'image' => $this->image ? $this->image : null,
+            'video' => $this->video ? $this->video : null,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

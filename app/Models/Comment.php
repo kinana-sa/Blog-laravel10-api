@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Comment extends Model
 {
     use HasFactory;
-    use SoftDeletes;
 
     protected $fillable =['content','user_id','post_id'];
 
@@ -31,7 +30,7 @@ class Comment extends Model
     }
     public function video()
     {
-        return $this->morphOne('App\Models\Vedio', 'videoable');
+        return $this->morphOne('App\Models\Video', 'videoable');
     }
 }
 
