@@ -8,8 +8,11 @@ use App\Models\Image;
 use App\Models\Video;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Events\CommentDeleting;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use App\Http\Requests\CommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Http\Controllers\Api\Traits\ApiResponse;
 use App\Http\Controllers\Api\Traits\FileUploadTrait;
@@ -26,7 +29,7 @@ class CommentController extends Controller
         return $this->successResponse($data, "Show All Comments", 200);
     }
 
-    public function store(Request $request, Post $post)
+    public function store(CommentRequest $request, Post $post)
     {
         try {
             $comment = Comment::create([
@@ -35,17 +38,14 @@ class CommentController extends Controller
                 'post_id' => $post->id
             ]);
             if ($request->hasFile('image')) {
-                [$name, $url] = $this->uploadFile($request, "image", "comments/images/");
-                $image = new Image();
-                $image->name = $name;
-                $image->url = $url;
+                $image = $request->file('image');
+                $image = $this->uploadFile($image, "comments/images/");
                 $comment->image()->save($image);
             }
-            if ($request->hasFile('video')) {
-                [$name, $url] = $this->uploadFile($request, "video", "comments/videos/");
-                $video = new Video();
-                $video->name = $name;
-                $video->url = $url;
+            elseif ($request->hasFile('video')) {
+                $video = $request->file('video');
+                $video = $this->uploadFile($video, "comments/videos/");
+               
                 $comment->video()->save($video);
             }
             return $this->successResponse(new CommentResource($comment), "Create New Comment", 201);
@@ -59,7 +59,7 @@ class CommentController extends Controller
         return $this->successResponse(new CommentResource($comment), "Show Comment", 200);
     }
 
-    public function update(Request $request, Comment $comment)
+    public function update(CommentRequest $request, Comment $comment)
     {
         if ($comment->user_id != Auth::id()) {
             return $this->errorResponse('Unauthorized', 403);
@@ -93,6 +93,8 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {   //Only Comment Owner or Admins Can Delete a Comment
         if ($comment->user_id == Auth::id() || User::findOrFail(Auth::id())->roles()->where('name', 'admin')->exists()) {
+           
+           event(new CommentDeleting($comment));
             $comment->delete();
             return $this->successResponse(null, "Comment Deleted Successfully.", 200);
         }

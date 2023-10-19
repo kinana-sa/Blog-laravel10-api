@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Events\CommentDeleting;
 
 class Comment extends Model
 {
@@ -32,5 +32,6 @@ class Comment extends Model
     {
         return $this->morphOne('App\Models\Video', 'videoable');
     }
+    
 }
 

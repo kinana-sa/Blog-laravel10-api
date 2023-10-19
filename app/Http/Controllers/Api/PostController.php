@@ -35,19 +35,23 @@ class PostController extends Controller
                 'user_id' => Auth::id()
             ]);
 
-            if ($request->hasFile('image')) {
-                [$name, $url] = $this->uploadFile($request, "image", "posts/images/");
-                $image = new Image();
-                $image->name = $name;
-                $image->url = $url;
-                $post->images()->save($image);
+            if ($request->hasFile('images')) {
+                $images = $request->file('images');
+                foreach($images as $img){
+
+                    $image = $this->uploadFile($img, "posts/images/");
+                    
+                    $post->images()->save($image);
+                }
             }
-            if ($request->hasFile('video')) {
-                [$name, $url] = $this->uploadFile($request, "video", "posts/videos/");
-                $video = new Video();
-                $video->name = $name;
-                $video->url = $url;
-                $post->videos()->save($video);
+            if ($request->hasFile('videos')) {
+                $videos = $request->file('videos');
+                foreach($videos as $vid){
+
+                    $video = $this->uploadFile($vid, "posts/videos/");
+                    
+                    $post->videos()->save($video);
+                }
             }
 
             return $this->successResponse(new PostResource($post), "Create New Post.", 201);
@@ -69,19 +73,23 @@ class PostController extends Controller
                 'title' => $request->title,
                 'body' => $request->body
             ]);
-            if ($request->hasFile('image')) {
-                [$name, $url] = $this->uploadFile($request, "image", "posts/images/");
-                $image = new Image();
-                $image->name = $name;
-                $image->url = $url;
-                $post->images()->save($image);
+            if ($request->hasFile('images')) {
+                $images = $request->file('images');
+                foreach($images as $img){
+
+                    $image = $this->uploadFile($img, "posts/images/");
+                    
+                    $post->images()->save($image);
+                }
             }
-            if ($request->hasFile('video')) {
-                [$name, $url] = $this->uploadFile($request, "video", "posts/videos/");
-                $video = new Video();
-                $video->name = $name;
-                $video->url = $url;
-                $post->videos()->save($video);
+            if ($request->hasFile('videos')) {
+                $videos = $request->file('videos');
+                foreach($videos as $vid){
+
+                    $video = $this->uploadFile($vid, "posts/videos/");
+                    
+                    $post->videos()->save($video);
+                }
             }
             return $this->successResponse(new PostResource($post), "Post Updated Successfully.", 200);
         } catch (AuthorizationException) {
