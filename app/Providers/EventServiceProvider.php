@@ -21,6 +21,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\CommentDeleting::class => [
             \App\Listeners\DeleteCommentMedia::class,
         ],
+        \App\Events\CommentUpdating::class => [
+            \App\Listeners\DeleteCommentMedia::class,
+        ],
     ];
 
     /**

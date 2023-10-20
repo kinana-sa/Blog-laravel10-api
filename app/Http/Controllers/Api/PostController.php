@@ -53,7 +53,6 @@ class PostController extends Controller
                     $post->videos()->save($video);
                 }
             }
-
             return $this->successResponse(new PostResource($post), "Create New Post.", 201);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 500);

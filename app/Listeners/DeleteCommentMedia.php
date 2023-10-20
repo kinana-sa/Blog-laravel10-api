@@ -19,7 +19,7 @@ class DeleteCommentMedia
     /**
      * Handle the event.
      */
-    public function handle(CommentDeleting $event): void
+    public function handle($event): void
     {
         $comment = $event->comment;
         $image = $comment->image;

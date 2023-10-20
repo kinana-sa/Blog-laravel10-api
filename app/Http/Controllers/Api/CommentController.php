@@ -9,6 +9,7 @@ use App\Models\Video;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Events\CommentDeleting;
+use App\Events\CommentUpdating;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -45,7 +46,6 @@ class CommentController extends Controller
             elseif ($request->hasFile('video')) {
                 $video = $request->file('video');
                 $video = $this->uploadFile($video, "comments/videos/");
-               
                 $comment->video()->save($video);
             }
             return $this->successResponse(new CommentResource($comment), "Create New Comment", 201);
@@ -70,17 +70,15 @@ class CommentController extends Controller
                 'content' => $request->content
             ]);
             if ($request->hasFile('image')) {
-                [$name, $url] = $this->uploadFile($request, "image", "comments/images/");
-                $image = new Image();
-                $image->name = $name;
-                $image->url = $url;
+                event(new CommentUpdating($comment));
+                $image = $request->file('image');
+                $image = $this->uploadFile($image, "comments/images/");
                 $comment->image()->save($image);
             }
-            if ($request->hasFile('video')) {
-                [$name, $url] = $this->uploadFile($request, "video", "comments/videos/");
-                $video = new Video();
-                $video->name = $name;
-                $video->url = $url;
+            elseif ($request->hasFile('video')) {
+                event(new CommentUpdating($comment));
+                $video = $request->file('video');
+                $video = $this->uploadFile($video, "comments/videos/");
                 $comment->video()->save($video);
             }
             
@@ -94,7 +92,7 @@ class CommentController extends Controller
     {   //Only Comment Owner or Admins Can Delete a Comment
         if ($comment->user_id == Auth::id() || User::findOrFail(Auth::id())->roles()->where('name', 'admin')->exists()) {
            
-           event(new CommentDeleting($comment));
+            event(new CommentDeleting($comment));
             $comment->delete();
             return $this->successResponse(null, "Comment Deleted Successfully.", 200);
         }
