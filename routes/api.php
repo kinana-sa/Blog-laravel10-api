@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\RoleUserController;
 
@@ -13,6 +14,8 @@ use App\Http\Controllers\Api\RoleUserController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('liked_posts',[LikeController::class,'getLikedPosts'])->middleware('auth:sanctum');
+   
 
 Route::prefix('auth')->group(function(){
 
@@ -60,5 +63,11 @@ Route::prefix('comments')->middleware('auth:sanctum')->group(function(){
     Route::post('/likes/toggle', [LikeController::class, 'toggleLike'])->name('likes.toggle-like');
 
     Route::get('/{post}',[CommentController::class,'getPostComments']);
+
+    Route::post('/follow/{user}', [FollowController::class,'follow']);
+    Route::post('/unfollow/{user}', [FollowController::class,'unfollow']);
+    Route::post('/accept/{user}', [FollowController::class,'accept']);
+    Route::post('/reject/{user}', [FollowController::class,'reject']);
+ 
    
 });
