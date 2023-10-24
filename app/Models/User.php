@@ -12,6 +12,22 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -23,7 +39,7 @@ class User extends Authenticatable
     }
 
     public function comments()
-    { 
+    {
         return $this->hasMany(Comment::class);
     }
 
@@ -37,7 +53,7 @@ class User extends Authenticatable
      */
     public function following()
     {
-        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
     }
 
     /**
@@ -45,7 +61,7 @@ class User extends Authenticatable
      */
     public function followers()
     {
-        return $this->hasMany(User::class, 'followers', 'follower_id', 'user_id');
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
     }
 
     public function isAdmin()
@@ -53,34 +69,18 @@ class User extends Authenticatable
         return $this->roles()->where('name', 'admin')->exists();
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    public function follow(User $user)
+    {
+        $this->following()->attach($user->id);
+    }
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    public function unfollow(User $user)
+    {
+        $this->following()->detach($user->id);
+    }
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    public function isFollowing(User $user)
+    {
+        return $this->following()->where('id', $user->id)->exists();
+    }
 }

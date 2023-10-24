@@ -14,14 +14,14 @@ class FollowController extends Controller
 
     public function follow(User $userToFollow)
     {
-        Auth::user()->followings()->attach($userToFollow->id); // To follow a user
+        Auth::user()->following()->attach($userToFollow); // To follow a user
 
         return $this->successResponse(null, 'Follow Request Sended Successfully.', 201);
     }
 
     public function unfollow(User $userToUnfollow)
     {
-        Auth::user()->followings()->detach($userToUnfollow->id); // To unfollow a user
+        Auth::user()->following()->detach($userToUnfollow); // To unfollow a user
 
         return $this->successResponse(null, 'Follow Deleted Successfully.', 200);
     }
@@ -29,16 +29,21 @@ class FollowController extends Controller
     public function accept(User $user)
     {
         auth()->user()->followers()->where('follower_id', $user->id)->update(['status' => 'accepted']);
+
+        return $this->successResponse(null, 'Follow Acceptted Successfully.', 200);
     }
 
     public function reject(User $user)
     {
         auth()->user()->followers()->where('follower_id', $user->id)->update(['status' => 'rejected']);
+
+        return $this->successResponse(null, 'Follow Rejected Successfully.', 200);
     }
 
     public function followersCount(User $user)
     {
-        return $user->followers()->where('status', 'accepted')->count();
-    }
+        $count = $user->followers()->where('status', 'accepted')->count();
 
+        return $this->successResponse($count, 'Number of Followers.', 200);
+    }
 }
